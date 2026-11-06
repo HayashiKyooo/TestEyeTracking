@@ -1255,13 +1255,10 @@ async function createWasm() {
       EyeGazeState.code = 1;
       EyeGazeState.message = "Loading Face Landmarker";
   
-      var raw = new Uint8Array(modelLength);
-      raw.set(HEAPU8.subarray(modelPtr, modelPtr + modelLength));
-      var start = 0;
-      if (!(raw[0] === 0x50 && raw[1] === 0x4b) && raw.length > 3 && raw[2] === 0x50 && raw[3] === 0x4b) {
-        start = 2;
-      }
-      var model = raw.subarray(start).slice();
+      // The .bytes file starts with 2 padding bytes before PK. The zip directory
+      // offsets include that padding, so the buffer must be passed through unchanged.
+      var model = new Uint8Array(modelLength);
+      model.set(HEAPU8.subarray(modelPtr, modelPtr + modelLength));
       var cdn = "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.34";
   
       import(cdn + "/vision_bundle.mjs").then(function (vision) {
